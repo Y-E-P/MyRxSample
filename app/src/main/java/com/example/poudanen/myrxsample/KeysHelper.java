@@ -3,6 +3,16 @@ package com.example.poudanen.myrxsample;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.poudanen.myrxsample.model.UserCredentials;
+
+import org.reactivestreams.Subscription;
+
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by poudanen on 18.01.17.
  */
@@ -20,8 +30,32 @@ public class KeysHelper {
         return sharedPreference;
     }
 
+    public Flowable<UserCredentials> getUserCredentials(){
+        //return Flowable.just(getUserCreObj());
+        return Flowable.just(getUserCreObj())
+                .doOnSubscribe(new Consumer<Subscription>() {
+                    @Override
+                    public void accept(Subscription subscription) throws Exception {
+
+                    }
+                })
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() throws Exception {
+
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+    }
+
     public KeysHelper() {
         super();
+    }
+
+    public UserCredentials getUserCreObj(){
+        return new UserCredentials("Mike","234324");
     }
 
     public boolean save(Context context, String text, String Key) {

@@ -1,29 +1,27 @@
 package com.example.poudanen.myrxsample;
 
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.poudanen.myrxsample.model.UserCredentials;
 import com.jakewharton.rxbinding.view.RxView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 
-import java.util.concurrent.Callable;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Timed;
+import io.reactivex.functions.Predicate;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -50,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         RxView.clicks(fab).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
-                Snackbar.make(fab, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                test2(fab);
             }
         });
+
 
         RxTextView.textChanges(editText)
                 .filter(new Func1<CharSequence, Boolean>() {
@@ -81,78 +79,47 @@ public class MainActivity extends AppCompatActivity {
                         textView.setText(charSequence);
                     }
                 });
-        doSomeWork();
+    }
+
+
+    public void test2(FloatingActionButton fab) {
+        KeysHelper.getInstance().getUserCredentials().filter(new Predicate<UserCredentials>() {
+            @Override
+            public boolean test(UserCredentials userCredentials) throws Exception {
+                return true;
+            }
+        }).subscribe(new Subscriber<UserCredentials>() {
+            @Override
+            public void onSubscribe(Subscription s) {
+                s.request(1);
+                Snackbar.make(fab, "onSubscribe", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+
+            @Override
+            public void onNext(UserCredentials userCredentials) {
+                Snackbar.make(fab, userCredentials.getName(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                Snackbar.make(fab, "onError" + t.getMessage(), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+
+            @Override
+            public void onComplete() {
+                Snackbar.make(fab, "Complete", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         disposables.clear(); // do not send event after activity has been destroyed
-    }
-
-    void doSomeWork() {
-        disposables.add(sampleObservable()
-                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribeWith(getInformation()));
-    }
-
-    public Observable<String> sampleObservable() {
-        return Observable.defer(new Callable<ObservableSource<String>>() {
-            @Override
-            public ObservableSource<String> call() throws Exception {
-                SystemClock.sleep(2000);
-                return Observable.just("one", "two", "three", "four", "five");
-            }
-        });
-    }
-
-    public DisposableObserver<String> getInformation() {
-        return new DisposableObserver<String>() {
-            @Override
-            public void onNext(String s) {
-                sampleObservableP(s);
-                textView.append(" onNext : value : " + s);
-                textView.append("\n");
-                Log.d(TAG, " onNext value : " + s);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                textView.append(" onError : " + e.getMessage());
-                textView.append("\n");
-                Log.d(TAG, " onError : " + e.getMessage());
-            }
-
-            @Override
-            public void onComplete() {
-                textView.append(" onComplete");
-                textView.append("\n");
-                Log.d(TAG, " onComplete");
-            }
-        };
-    }
-
-    void sampleObservableP(final String text) {
-        Observable.interval(1000L, TimeUnit.MILLISECONDS)
-                .timeInterval()
-                .observeOn(io.reactivex.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new DisposableObserver<Timed<Long>>() {
-                    @Override
-                    public void onNext(Timed<Long> longTimed) {
-                        textView.setText(text);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
     }
 
     @Override
