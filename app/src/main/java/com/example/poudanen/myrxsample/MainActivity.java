@@ -2,38 +2,40 @@ package com.example.poudanen.myrxsample;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.poudanen.myrxsample.model.UserCredentials;
 import com.jakewharton.rxbinding.view.RxView;
-import com.jakewharton.rxbinding.widget.RxTextView;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.Flowable;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Cancellable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private EditText editText;
+    private EditText loginEdit, passwordEdit;
+    private Button button;
     private TextView textView;
-    private final CompositeDisposable disposables = new CompositeDisposable();
     private LinearLayout linearLayout;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +43,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        editText = (EditText) findViewById(R.id.editText);
+        loginEdit = (EditText) findViewById(R.id.edit_login);
+        passwordEdit = (EditText) findViewById(R.id.edit_password);
         textView = (TextView) findViewById(R.id.textView);
         linearLayout = (LinearLayout) findViewById(R.id.lay);
+        button = (Button) findViewById(R.id.button);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        observ();
         RxView.clicks(fab).subscribe(new Action1<Void>() {
             @Override
             public void call(Void aVoid) {
@@ -52,18 +58,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Observable.just(loginEdit.getText().toString()).subscribe(new Consumer<String>() {
+            @Override
+            public void accept(String s) throws Exception {
+                textView.setText(s);
+            }
+        });
 
-        RxTextView.textChanges(editText)
-                .filter(new Func1<CharSequence, Boolean>() {
+        /*rx.Observable.combineLatest(RxTextView.textChanges(loginEdit),
+                RxTextView.textChanges(passwordEdit),
+                new Func2<CharSequence, CharSequence, Boolean>() {
                     @Override
-                    public Boolean call(CharSequence s) {
-                        return s.length() > 2;
+                    public Boolean call(CharSequence login, CharSequence password) {
+                        double x = ((password.length()+login.length()) * 100) / 10;
+                        progressBar.setProgress((int) x);
+                        return login.length() > 3 && password.length() > 3;
                     }
                 })
-                .debounce(100, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<CharSequence>() {
+                .subscribeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Boolean>() {
                     @Override
                     public void onCompleted() {
 
@@ -71,55 +84,152 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        button.setText("divide by zero");
 
                     }
 
                     @Override
-                    public void onNext(CharSequence charSequence) {
-                        textView.setText(charSequence);
+                    public void onNext(Boolean aBoolean) {
+                        button.setText(aBoolean ? "Success" : "Fuck");
+                        button.setEnabled(aBoolean);
+                        progressBar.setVisibility(aBoolean ? View.GONE : View.VISIBLE);
+                    }
+                });*/
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                KeysHelper.getInstance().save(MainActivity.this, passwordEdit.getText().toString(), "PASSWORD");
+                KeysHelper.getInstance().save(MainActivity.this, loginEdit.getText().toString(), "NAME");
+            }
+        });
+
+
+    }
+
+    public void observ() {
+        Observable.combineLatest(createTextChangeObservable(loginEdit), createTextChangeObservable(passwordEdit),
+                new BiFunction<String, String, Boolean>() {
+            @Override
+            public Boolean apply(String login, String password) throws Exception {
+                double x = (password.length() * 100) / 6;
+                progressBar.setProgress((int) x);
+                return login.length() > 3 && password.length() > 3;
+            }
+        })/*subscribeOn(AndroidSchedulers.mainThread())*/.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        button.setText(aBoolean ? "Success" : "Fuck");
+                        button.setEnabled(aBoolean);
+                        progressBar.setVisibility(aBoolean ? View.GONE : View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        button.setText("divide by zero");
+                    }
+
+                    @Override
+                    public void onComplete() {
+
                     }
                 });
     }
 
-
     public void test2(FloatingActionButton fab) {
-        KeysHelper.getInstance().getUserCredentials().filter(new Predicate<UserCredentials>() {
+        Flowable<UserCredentials> flowable = KeysHelper.getInstance().getUserObj(MainActivity.this)
+                .filter(new Predicate<UserCredentials>() {
+                    @Override
+                    public boolean test(UserCredentials userCredentials) throws Exception {
+                        return true;
+                    }
+                })
+                .subscribeOn(io.reactivex.schedulers.Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+        Disposable textDisponce = flowable.subscribe(new Consumer<UserCredentials>() {
             @Override
-            public boolean test(UserCredentials userCredentials) throws Exception {
-                return true;
-            }
-        }).subscribe(new Subscriber<UserCredentials>() {
-            @Override
-            public void onSubscribe(Subscription s) {
-                s.request(1);
-                Snackbar.make(fab, "onSubscribe", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-
-            @Override
-            public void onNext(UserCredentials userCredentials) {
-                Snackbar.make(fab, userCredentials.getName(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                Snackbar.make(fab, "onError" + t.getMessage(), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-
-            @Override
-            public void onComplete() {
-                Snackbar.make(fab, "Complete", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void accept(UserCredentials userCredentials) throws Exception {
+                textView.setText(userCredentials.toString());
             }
         });
+
+        addObserver(textDisponce);
+    }
+
+    public Observable<String> subsEdit(final EditText editText) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                editText.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (!emitter.isDisposed()) {
+                            emitter.onNext(s.toString());
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                });
+            }
+        });
+    }
+
+    private Observable<String> createTextChangeObservable(final EditText editText) {
+        //2
+        Observable<String> textChangeObservable = Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                //3
+                final TextWatcher watcher = new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+
+                    //4
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (!emitter.isDisposed()) {
+                            emitter.onNext(s.toString());
+                        }
+                    }
+                };
+
+                //5
+                editText.addTextChangedListener(watcher);
+
+                //6
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        editText.removeTextChangedListener(watcher);
+                    }
+                });
+            }
+        });
+
+        // 7
+        return textChangeObservable;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposables.clear(); // do not send event after activity has been destroyed
     }
 
     @Override
@@ -134,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
