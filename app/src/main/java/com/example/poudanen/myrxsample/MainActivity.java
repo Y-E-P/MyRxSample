@@ -1,6 +1,7 @@
 package com.example.poudanen.myrxsample;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -16,6 +17,9 @@ import android.widget.TextView;
 
 import com.example.poudanen.myrxsample.model.UserCredentials;
 import com.jakewharton.rxbinding.view.RxView;
+
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -65,37 +69,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        /*rx.Observable.combineLatest(RxTextView.textChanges(loginEdit),
-                RxTextView.textChanges(passwordEdit),
-                new Func2<CharSequence, CharSequence, Boolean>() {
-                    @Override
-                    public Boolean call(CharSequence login, CharSequence password) {
-                        double x = ((password.length()+login.length()) * 100) / 10;
-                        progressBar.setProgress((int) x);
-                        return login.length() > 3 && password.length() > 3;
-                    }
-                })
-                .subscribeOn(rx.android.schedulers.AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Boolean>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        button.setText("divide by zero");
-
-                    }
-
-                    @Override
-                    public void onNext(Boolean aBoolean) {
-                        button.setText(aBoolean ? "Success" : "Fuck");
-                        button.setEnabled(aBoolean);
-                        progressBar.setVisibility(aBoolean ? View.GONE : View.VISIBLE);
-                    }
-                });*/
-
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,15 +81,31 @@ public class MainActivity extends BaseActivity {
     }
 
     public void observ() {
+        Flowable.combineLatest(new Publisher<EditText>() {
+            @Override
+            public void subscribe(Subscriber<? super EditText> s) {
+
+            }
+        }, new Publisher<EditText>() {
+            @Override
+            public void subscribe(Subscriber<? super EditText> s) {
+
+            }
+        }, new BiFunction<EditText, EditText, Object>() {
+            @Override
+            public Object apply(EditText editText, EditText editText2) throws Exception {
+                return null;
+            }
+        });
         Observable.combineLatest(createTextChangeObservable(loginEdit), createTextChangeObservable(passwordEdit),
                 new BiFunction<String, String, Boolean>() {
-            @Override
-            public Boolean apply(String login, String password) throws Exception {
-                double x = (password.length() * 100) / 6;
-                progressBar.setProgress((int) x);
-                return login.length() > 3 && password.length() > 3;
-            }
-        })/*subscribeOn(AndroidSchedulers.mainThread())*/.observeOn(AndroidSchedulers.mainThread())
+                    @Override
+                    public Boolean apply(String login, String password) throws Exception {
+                        double x = (password.length() * 100) / 6;
+                        progressBar.setProgress((int) x);
+                        return login.length() > 3 && password.length() > 3;
+                    }
+                }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new io.reactivex.Observer<Boolean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -188,18 +177,20 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    private Observable<String> createTextChangeObservable(final EditText editText) {
-        //2
-        Observable<String> textChangeObservable = Observable.create(new ObservableOnSubscribe<String>() {
+    private Observable<String> createTextChangeObservable(@NonNull final EditText editText) {
+
+        return Observable.create(new ObservableOnSubscribe<String>() {
             @Override
             public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
                 //3
                 final TextWatcher watcher = new TextWatcher() {
                     @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
 
                     @Override
-                    public void afterTextChanged(Editable s) {}
+                    public void afterTextChanged(Editable s) {
+                    }
 
                     //4
                     @Override
@@ -210,8 +201,6 @@ public class MainActivity extends BaseActivity {
                     }
                 };
 
-                //5
-                editText.addTextChangedListener(watcher);
 
                 //6
                 emitter.setCancellable(new Cancellable() {
@@ -220,12 +209,14 @@ public class MainActivity extends BaseActivity {
                         editText.removeTextChangedListener(watcher);
                     }
                 });
+                //5
+                editText.addTextChangedListener(watcher);
+                emitter.onNext(editText.getText().toString());
             }
         });
 
-        // 7
-        return textChangeObservable;
     }
+
 
     @Override
     protected void onDestroy() {
