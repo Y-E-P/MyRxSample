@@ -1,6 +1,9 @@
 package com.example.poudanen.myrxsample.ui;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -84,4 +87,39 @@ public class RxHelperView {
             }
         });
     }
+
+    public static Observable<Boolean> dialog(final Context context, final int title, final int message) {
+        return Observable.create(new ObservableOnSubscribe<Boolean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Boolean> emitter) throws Exception {
+                final AlertDialog ad = new AlertDialog.Builder(context)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                emitter.onNext(true);
+                                emitter.onComplete();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                emitter.onNext(false);
+                                emitter.onComplete();
+                            }
+                        }).create();
+                emitter.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() throws Exception {
+                        if (!emitter.isDisposed()) {
+                            ad.dismiss();
+                        }
+                    }
+                });
+                ad.show();
+            }
+        });
+    }
+
 }

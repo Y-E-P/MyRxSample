@@ -17,6 +17,7 @@ import com.example.poudanen.myrxsample.ui.RxHelperView;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
@@ -48,7 +49,31 @@ public class MainActivity extends BaseActivity {
         Disposable p = RxHelperView.click(fab).subscribe(new Consumer<Object>() {
             @Override
             public void accept(Object aVoid) throws Exception {
-                test2(fab);
+                RxHelperView.dialog(MainActivity.this, R.string.app_name, R.string.app_name).subscribe(new Observer<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        MainActivity.this.addObserver(d);
+                    }
+
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        if (aBoolean) {
+                            test2();
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        textView.setText("Im complete");
+                    }
+                });
             }
         });
 
@@ -108,7 +133,7 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
-    public void test2(FloatingActionButton fab) {
+    public void test2() {
         Flowable<UserCredentials> flowable = KeysHelper.getInstance().getUserObj(MainActivity.this)
                 .filter(new Predicate<UserCredentials>() {
                     @Override
