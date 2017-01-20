@@ -1,11 +1,8 @@
 package com.example.poudanen.myrxsample;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,22 +13,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.poudanen.myrxsample.model.UserCredentials;
-import com.jakewharton.rxbinding.view.RxView;
-
-import org.reactivestreams.Publisher;
-import org.reactivestreams.Subscriber;
+import com.example.poudanen.myrxsample.ui.RxHelperView;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
-import rx.functions.Action1;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -55,14 +45,15 @@ public class MainActivity extends BaseActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         observ();
-        RxView.clicks(fab).subscribe(new Action1<Void>() {
+        Disposable p = RxHelperView.click(fab).subscribe(new Consumer<Object>() {
             @Override
-            public void call(Void aVoid) {
+            public void accept(Object aVoid) throws Exception {
                 test2(fab);
             }
         });
 
-        Observable.just(loginEdit.getText().toString()).subscribe(new Consumer<String>() {
+
+        Disposable x = Observable.just(loginEdit.getText().toString()).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
                 textView.setText(s);
@@ -77,27 +68,13 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        addObserver(p);
+        addObserver(x);
 
     }
 
     public void observ() {
-        Flowable.combineLatest(new Publisher<EditText>() {
-            @Override
-            public void subscribe(Subscriber<? super EditText> s) {
-
-            }
-        }, new Publisher<EditText>() {
-            @Override
-            public void subscribe(Subscriber<? super EditText> s) {
-
-            }
-        }, new BiFunction<EditText, EditText, Object>() {
-            @Override
-            public Object apply(EditText editText, EditText editText2) throws Exception {
-                return null;
-            }
-        });
-        Observable.combineLatest(createTextChangeObservable(loginEdit), createTextChangeObservable(passwordEdit),
+        Observable.combineLatest(RxHelperView.createTextChangeObservable(loginEdit), RxHelperView.createTextChangeObservable(passwordEdit),
                 new BiFunction<String, String, Boolean>() {
                     @Override
                     public Boolean apply(String login, String password) throws Exception {
@@ -149,72 +126,6 @@ public class MainActivity extends BaseActivity {
         });
 
         addObserver(textDisponce);
-    }
-
-    public Observable<String> subsEdit(final EditText editText) {
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
-                editText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (!emitter.isDisposed()) {
-                            emitter.onNext(s.toString());
-                        }
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                });
-            }
-        });
-    }
-
-    private Observable<String> createTextChangeObservable(@NonNull final EditText editText) {
-
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
-                //3
-                final TextWatcher watcher = new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                    }
-
-                    //4
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (!emitter.isDisposed()) {
-                            emitter.onNext(s.toString());
-                        }
-                    }
-                };
-
-
-                //6
-                emitter.setCancellable(new Cancellable() {
-                    @Override
-                    public void cancel() throws Exception {
-                        editText.removeTextChangedListener(watcher);
-                    }
-                });
-                //5
-                editText.addTextChangedListener(watcher);
-                emitter.onNext(editText.getText().toString());
-            }
-        });
-
     }
 
 
