@@ -6,11 +6,11 @@ package com.example.poudanen.myrxsample.model;
 
 public class UserCredentials {
 
-    private String name,login;
+    private String name, password;
 
     public UserCredentials(String name, String login) {
         this.name = name;
-        this.login = login;
+        this.password = login;
     }
 
     public String getName() {
@@ -21,19 +21,19 @@ public class UserCredentials {
         this.name = name;
     }
 
-    public String getLogin() {
-        return login;
+    public String getPassword() {
+        return password;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
         return "UserCredentials{" +
                 "name='" + name + '\'' +
-                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 }

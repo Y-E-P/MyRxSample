@@ -14,7 +14,8 @@ import io.reactivex.Flowable;
 public class KeysHelper {
     private static KeysHelper sharedPreference;
     public static final String PREFS_NAME = "AOP_PREFS";
-    public static final String PREFS_KEY = "AOP_PREFS_String";
+    public static final String NAME_KEY = "NAME";
+    public static final String PASSWORD_KEY = "PASSWORD";
 
 
     public static KeysHelper getInstance() {
@@ -30,12 +31,18 @@ public class KeysHelper {
     }
 
     public Flowable<UserCredentials> getUserObj(Context context) {
-        UserCredentials userCredentials = new UserCredentials(getValue(context, "NAME"), getValue(context, "PASSWORD"));
+        UserCredentials userCredentials = new UserCredentials(getValue(context, NAME_KEY), getValue(context, PASSWORD_KEY));
         return Flowable.just(userCredentials);
     }
 
-    public boolean getUserObj(Context context, String name, String password) {
-        return save(context, name, "NAME") && save(context, password, "PASSWORD");
+    public UserCredentials getUserCredentials(Context context) {
+        UserCredentials userCredentials = new UserCredentials(getValue(context, NAME_KEY), getValue(context, PASSWORD_KEY));
+        return userCredentials;
+    }
+
+
+    public boolean saveUserCredentials(Context context, UserCredentials userCredentials) {
+        return save(context, userCredentials.getName(), NAME_KEY) && save(context, userCredentials.getPassword(), PASSWORD_KEY);
     }
 
     public boolean save(Context context, String text, String Key) {
