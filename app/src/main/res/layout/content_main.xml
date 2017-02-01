@@ -33,6 +33,12 @@
                 android:layout_height="wrap_content"
                 android:text="Hello World!" />
 
+            <TextView
+                android:id="@+id/textViewDagger"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hello World!" />
+
             <EditText
                 android:id="@+id/edit_login"
                 android:layout_width="match_parent"

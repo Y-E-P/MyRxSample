@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.poudanen.myrxsample.BaseActivity;
+import com.example.poudanen.myrxsample.BaseApplications;
 import com.example.poudanen.myrxsample.R;
 import com.example.poudanen.myrxsample.activities.interactor.InteractorImpl;
 import com.example.poudanen.myrxsample.activities.presenter.MainPresenter;
@@ -16,9 +17,15 @@ import com.example.poudanen.myrxsample.activities.presenter.MainViewPresenterImp
 import com.example.poudanen.myrxsample.activities.view.MainView;
 import com.example.poudanen.myrxsample.databinding.ActivityMainBinding;
 import com.example.poudanen.myrxsample.databinding.ContentMainBinding;
+import com.example.poudanen.myrxsample.di_sample.IDaggerComponent;
+import com.example.poudanen.myrxsample.model.UserCredentials;
 import com.example.poudanen.myrxsample.ui.RxHelperView;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
@@ -26,16 +33,22 @@ import io.reactivex.functions.Consumer;
 
 public class MainActivity extends BaseActivity implements MainView {
     private static final String TAG = MainActivity.class.getSimpleName();
+    @Named("object")
+    @Inject
+    UserCredentials userCredentials;
     private ActivityMainBinding mainBinding;
     private ContentMainBinding contentBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        IDaggerComponent componentX = BaseApplications.component(this);
+        componentX.inject(this);
         mainBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
-        contentBinding = mainBinding.contentMain;
+        contentBinding = mainBinding.mainContent;
         setSupportActionBar(mainBinding.toolbar);
         observ();
+        contentBinding.textViewDagger.setText(userCredentials.getName());
         Disposable disposable = Observable.just(contentBinding.editLogin.getText().toString()).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
@@ -67,7 +80,7 @@ public class MainActivity extends BaseActivity implements MainView {
                         return login.length() > 3 && password.length() > 3;
                     }
                 }).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new io.reactivex.Observer<Boolean>() {
+                .subscribe(new Observer<Boolean>() {
                     @Override
                     public void onSubscribe(Disposable d) {
 
