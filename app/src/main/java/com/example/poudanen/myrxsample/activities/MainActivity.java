@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.poudanen.myrxsample.BaseActivity;
-import com.example.poudanen.myrxsample.BaseApplications;
+import com.example.poudanen.myrxsample.KeysHelper;
 import com.example.poudanen.myrxsample.R;
 import com.example.poudanen.myrxsample.activities.interactor.InteractorImpl;
 import com.example.poudanen.myrxsample.activities.presenter.MainPresenter;
@@ -17,12 +17,9 @@ import com.example.poudanen.myrxsample.activities.presenter.MainViewPresenterImp
 import com.example.poudanen.myrxsample.activities.view.MainView;
 import com.example.poudanen.myrxsample.databinding.ActivityMainBinding;
 import com.example.poudanen.myrxsample.databinding.ContentMainBinding;
-import com.example.poudanen.myrxsample.di_sample.IDaggerComponent;
-import com.example.poudanen.myrxsample.model.UserCredentials;
 import com.example.poudanen.myrxsample.ui.RxHelperView;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -31,24 +28,27 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 
+import static com.example.poudanen.myrxsample.KeysHelper.NAME_KEY;
+
 public class MainActivity extends BaseActivity implements MainView {
     private static final String TAG = MainActivity.class.getSimpleName();
-    @Named("object")
+
     @Inject
-    UserCredentials userCredentials;
+    KeysHelper keysHelper;
+    @Inject
+    InteractorImpl interactor;
     private ActivityMainBinding mainBinding;
     private ContentMainBinding contentBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        IDaggerComponent componentX = BaseApplications.component(this);
-        componentX.inject(this);
         mainBinding = DataBindingUtil.setContentView(MainActivity.this, R.layout.activity_main);
+        getActivityComponent().inject(this);
         contentBinding = mainBinding.mainContent;
         setSupportActionBar(mainBinding.toolbar);
         observ();
-        contentBinding.textViewDagger.setText(userCredentials.getName());
+        contentBinding.textViewDagger.setText(keysHelper.getValue(NAME_KEY));
         Disposable disposable = Observable.just(contentBinding.editLogin.getText().toString()).subscribe(new Consumer<String>() {
             @Override
             public void accept(String s) throws Exception {
@@ -154,6 +154,6 @@ public class MainActivity extends BaseActivity implements MainView {
 
     @Override
     public MainPresenter getPresenter() {
-        return new MainViewPresenterImpl(this, new InteractorImpl(this));
+        return new MainViewPresenterImpl(this, interactor);
     }
 }

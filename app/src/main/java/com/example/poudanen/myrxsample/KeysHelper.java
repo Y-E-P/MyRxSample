@@ -3,7 +3,10 @@ package com.example.poudanen.myrxsample;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.poudanen.myrxsample.di_sample.ApplicationContext;
 import com.example.poudanen.myrxsample.model.UserCredentials;
+
+import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 
@@ -17,35 +20,29 @@ public class KeysHelper {
     public static final String NAME_KEY = "NAME";
     public static final String PASSWORD_KEY = "PASSWORD";
 
+    private Context context;
 
-    public static KeysHelper getInstance() {
-        if (sharedPreference == null) {
-            sharedPreference = new KeysHelper();
-        }
-        return sharedPreference;
+    @Inject
+    public KeysHelper(@ApplicationContext Context context) {
+        this.context = context;
     }
 
-
-    public KeysHelper() {
-        super();
-    }
-
-    public Flowable<UserCredentials> getUserObj(Context context) {
-        UserCredentials userCredentials = new UserCredentials(getValue(context, NAME_KEY), getValue(context, PASSWORD_KEY));
+    public Flowable<UserCredentials> getUserObj() {
+        UserCredentials userCredentials = new UserCredentials(getValue(NAME_KEY), getValue(PASSWORD_KEY));
         return Flowable.just(userCredentials);
     }
 
-    public UserCredentials getUserCredentials(Context context) {
-        UserCredentials userCredentials = new UserCredentials(getValue(context, NAME_KEY), getValue(context, PASSWORD_KEY));
+    public UserCredentials getUserCredentials() {
+        UserCredentials userCredentials = new UserCredentials(getValue(NAME_KEY), getValue(PASSWORD_KEY));
         return userCredentials;
     }
 
 
-    public boolean saveUserCredentials(Context context, UserCredentials userCredentials) {
-        return save(context, userCredentials.getName(), NAME_KEY) && save(context, userCredentials.getPassword(), PASSWORD_KEY);
+    public boolean saveUserCredentials(UserCredentials userCredentials) {
+        return save(userCredentials.getName(), NAME_KEY) && save(userCredentials.getPassword(), PASSWORD_KEY);
     }
 
-    public boolean save(Context context, String text, String Key) {
+    public boolean save(String text, String Key) {
         SharedPreferences settings;
         SharedPreferences.Editor editor;
         settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE); //1
@@ -54,7 +51,7 @@ public class KeysHelper {
         return editor.commit(); //4
     }
 
-    public String getValue(Context context, String Key) {
+    public String getValue(String Key) {
         SharedPreferences settings;
         String text = "";
         settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -62,7 +59,7 @@ public class KeysHelper {
         return text;
     }
 
-    public boolean clearSharedPreference(Context context) {
+    public boolean clearSharedPreference() {
         SharedPreferences settings;
         SharedPreferences.Editor editor;
         settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -72,7 +69,7 @@ public class KeysHelper {
         return editor.commit();
     }
 
-    public boolean removeValue(Context context, String value) {
+    public boolean removeValue(String value) {
         SharedPreferences settings;
         SharedPreferences.Editor editor;
         settings = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);

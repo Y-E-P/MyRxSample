@@ -1,9 +1,9 @@
 package com.example.poudanen.myrxsample.activities.interactor;
 
-import android.content.Context;
-
 import com.example.poudanen.myrxsample.KeysHelper;
 import com.example.poudanen.myrxsample.model.UserCredentials;
+
+import javax.inject.Inject;
 
 /**
  * Created by Yuriy on 31.01.2017.
@@ -11,19 +11,20 @@ import com.example.poudanen.myrxsample.model.UserCredentials;
 
 public class InteractorImpl implements IntercatorInterface {
 
-    private Context context;
+    private KeysHelper keysHelper;
 
-    public InteractorImpl(Context context) {
-        this.context = context;
+    @Inject
+    public InteractorImpl(KeysHelper keysHelper) {
+        this.keysHelper = keysHelper;
     }
 
     @Override
     public UserCredentials getUserCredentials() {
-        return KeysHelper.getInstance().getUserCredentials(context);
+        return keysHelper.getUserCredentials();
     }
 
     @Override
     public boolean saveUserCredentials(UserCredentials userCredentials) {
-        return KeysHelper.getInstance().saveUserCredentials(context, userCredentials);
+        return keysHelper.saveUserCredentials(userCredentials);
     }
 }

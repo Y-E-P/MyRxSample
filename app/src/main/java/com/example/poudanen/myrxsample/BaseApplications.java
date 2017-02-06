@@ -3,29 +3,35 @@ package com.example.poudanen.myrxsample;
 import android.app.Application;
 import android.content.Context;
 
-import com.example.poudanen.myrxsample.di_sample.DaggerIDaggerComponent;
-import com.example.poudanen.myrxsample.di_sample.DaggerPrefsHelper;
-import com.example.poudanen.myrxsample.di_sample.IDaggerComponent;
+import com.example.poudanen.myrxsample.di_sample.components.AppComponent;
+import com.example.poudanen.myrxsample.di_sample.components.DaggerAppComponent;
+import com.example.poudanen.myrxsample.di_sample.modules.AppModule;
 
 /**
  * Created by poudanen on 01.02.17.
  */
 
 public class BaseApplications extends Application {
-    private IDaggerComponent IDaggerComponent;
+    private AppComponent appComponent;
     private static Context mContext;
-    public static IDaggerComponent component(Context context) {
-        return ((BaseApplications) context.getApplicationContext()).IDaggerComponent;
-    }
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
-        IDaggerComponent = DaggerIDaggerComponent.builder().daggerPrefsHelper(new DaggerPrefsHelper()).build();
+        appComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
     }
 
-    public static Context getContext() {
-        return mContext;
+    public static BaseApplications get(Context context) {
+        return (BaseApplications) context.getApplicationContext();
+    }
+
+    public AppComponent getAppComponent() {
+        return appComponent;
+    }
+
+    public void setAppComponent(AppComponent appComponent) {
+        this.appComponent = appComponent;
     }
 }
