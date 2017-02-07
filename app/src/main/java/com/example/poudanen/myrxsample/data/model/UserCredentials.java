@@ -1,4 +1,4 @@
-package com.example.poudanen.myrxsample.model;
+package com.example.poudanen.myrxsample.data.model;
 
 /**
  * Created by poudanen on 18.01.17.

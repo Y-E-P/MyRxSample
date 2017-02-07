@@ -1,4 +1,4 @@
-package com.example.poudanen.myrxsample.activities;
+package com.example.poudanen.myrxsample.ui.activities.second_screen;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;

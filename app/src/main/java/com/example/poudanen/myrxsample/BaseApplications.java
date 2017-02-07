@@ -6,6 +6,7 @@ import android.content.Context;
 import com.example.poudanen.myrxsample.di_sample.components.AppComponent;
 import com.example.poudanen.myrxsample.di_sample.components.DaggerAppComponent;
 import com.example.poudanen.myrxsample.di_sample.modules.AppModule;
+import com.example.poudanen.myrxsample.di_sample.modules.RetroModule;
 
 /**
  * Created by poudanen on 01.02.17.
@@ -13,18 +14,19 @@ import com.example.poudanen.myrxsample.di_sample.modules.AppModule;
 
 public class BaseApplications extends Application {
     private AppComponent appComponent;
-    private static Context mContext;
 
+    public static BaseApplications get(Context context) {
+        return (BaseApplications) context.getApplicationContext();
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = getApplicationContext();
-        appComponent = DaggerAppComponent.builder().appModule(new AppModule(this)).build();
-    }
-
-    public static BaseApplications get(Context context) {
-        return (BaseApplications) context.getApplicationContext();
+        appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .retroModule(new RetroModule("https://api.github.com"))
+                .build();
+        appComponent.inject(this);
     }
 
     public AppComponent getAppComponent() {

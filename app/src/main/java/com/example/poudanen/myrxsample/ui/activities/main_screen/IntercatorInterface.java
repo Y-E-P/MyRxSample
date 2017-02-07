@@ -1,6 +1,6 @@
-package com.example.poudanen.myrxsample.activities.interactor;
+package com.example.poudanen.myrxsample.ui.activities.main_screen;
 
-import com.example.poudanen.myrxsample.model.UserCredentials;
+import com.example.poudanen.myrxsample.data.model.UserCredentials;
 
 /**
  * Created by Yuriy on 31.01.2017.
@@ -11,5 +11,7 @@ public interface IntercatorInterface {
     UserCredentials getUserCredentials();
 
     boolean saveUserCredentials(UserCredentials userCredentials);
+
+    boolean saveUserToken(String token);
 
 }

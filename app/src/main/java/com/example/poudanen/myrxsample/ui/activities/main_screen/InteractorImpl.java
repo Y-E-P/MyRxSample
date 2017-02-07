@@ -1,9 +1,11 @@
-package com.example.poudanen.myrxsample.activities.interactor;
+package com.example.poudanen.myrxsample.ui.activities.main_screen;
 
-import com.example.poudanen.myrxsample.KeysHelper;
-import com.example.poudanen.myrxsample.model.UserCredentials;
+import com.example.poudanen.myrxsample.data.KeysHelper;
+import com.example.poudanen.myrxsample.data.model.UserCredentials;
 
 import javax.inject.Inject;
+
+import static com.example.poudanen.myrxsample.data.IKeysHelper.TOKEN;
 
 /**
  * Created by Yuriy on 31.01.2017.
@@ -26,5 +28,10 @@ public class InteractorImpl implements IntercatorInterface {
     @Override
     public boolean saveUserCredentials(UserCredentials userCredentials) {
         return keysHelper.saveUserCredentials(userCredentials);
+    }
+
+    @Override
+    public boolean saveUserToken(String token) {
+        return keysHelper.save(token, TOKEN);
     }
 }
