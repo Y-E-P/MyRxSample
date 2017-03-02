@@ -1,8 +1,6 @@
 package com.example.poudanen.myrxsample.ui.activities.second_screen;
 
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,32 +9,15 @@ import android.view.animation.AnimationUtils;
 
 import com.example.poudanen.myrxsample.R;
 import com.example.poudanen.myrxsample.databinding.ActivitySecondBinding;
+import com.example.poudanen.myrxsample.utils.VrBitmapShow;
 import com.google.vr.sdk.widgets.pano.VrPanoramaEventListener;
-import com.google.vr.sdk.widgets.pano.VrPanoramaView;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 public class SecondActivity extends AppCompatActivity {
 
+    public static final String TAG = SecondActivity.class.getSimpleName();
     private ActivitySecondBinding activitySecondBinding;
-
-    private Target target = new Target() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            VrPanoramaView.Options panoOptions = null;
-            panoOptions = new VrPanoramaView.Options();
-            panoOptions.inputType = VrPanoramaView.Options.TYPE_STEREO_OVER_UNDER;
-            activitySecondBinding.content.panoView.loadImageFromBitmap(bitmap, panoOptions);
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-        }
-    };
+    private VrBitmapShow target1, target2, target3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,12 +58,19 @@ public class SecondActivity extends AppCompatActivity {
     }
 
     private void someMethod() {
-        Picasso.with(this).load("https://o.vrchive.com/index.php?url=s3-us-west-2.amazonaws.com/vrchiveupload1/2016/05/07/Witcher-LightHouse-SmartPhone-360-Stereo-2016-05-03-16-44-31.jpg").into(target);
+        target1 = new VrBitmapShow(activitySecondBinding.content.panoView);
+        target2 = new VrBitmapShow(activitySecondBinding.content.panoViewOne);
+        target3 = new VrBitmapShow(activitySecondBinding.content.panoViewTwo);
+        Picasso.with(this).load("https://o.vrchive.com/index.php?url=s3-us-west-2.amazonaws.com/vrchiveupload1/2016/05/07/Witcher-LightHouse-SmartPhone-360-Stereo-2016-05-03-16-44-31.jpg").into(target1);
+        Picasso.with(this).load("https://raw.githubusercontent.com/googlevr/gvr-android-sdk/master/samples/sdk-simplepanowidget/src/main/assets/andes.jpg").into(target2);
+        Picasso.with(this).load("https://developers.google.com/vr/images/concepts/vrview-mono-stereo.jpg").into(target3);
     }
 
     @Override
     public void onDestroy() {  // could be in onPause or onStop
-        Picasso.with(this).cancelRequest(target);
+        Picasso.with(this).cancelRequest(target1);
+        Picasso.with(this).cancelRequest(target2);
+        Picasso.with(this).cancelRequest(target3);
         activitySecondBinding.content.panoView.shutdown();
         super.onDestroy();
     }

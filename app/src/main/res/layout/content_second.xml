@@ -4,105 +4,130 @@
         xmlns:tools="http://schemas.android.com/tools">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="top">
+        android:fitsSystemWindows="true"
+        android:layout_marginTop="55dp"
+        android:layout_height="match_parent">
 
-        <com.google.vr.sdk.widgets.pano.VrPanoramaView
-            android:id="@+id/pano_view"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="250dip"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="5dip"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"/>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true">
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:id="@+id/scroller"
+            android:layout_alignParentStart="true">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    app:srcCompat="@drawable/ic_smartphone_black_24dp"
-                    android:id="@+id/imageView4"
-                    android:layout_weight="1"/>
+                <com.google.vr.sdk.widgets.pano.VrPanoramaView
+                    android:id="@+id/pano_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dip"
+                    android:layout_margin="10dp"/>
 
-                <android.support.constraint.ConstraintLayout
-                    android:id="@+id/content_second"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                    tools:context=".ui.activities.second_screen.SecondActivity"
-                    tools:showIn="@layout/activity_second">
+                <com.google.vr.sdk.widgets.pano.VrPanoramaView
+                    android:id="@+id/pano_view_one"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dip"
+                    android:hapticFeedbackEnabled="true"
+                    android:layout_margin="10dp"/>
 
-                    <ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="wrap_content"
+                <com.google.vr.sdk.widgets.pano.VrPanoramaView
+                    android:id="@+id/pano_view_two"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dip"
+                    android:layout_margin="10dp"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            app:srcCompat="@drawable/ic_smartphone_black_24dp"
+                            android:id="@+id/imageView4"
+                            android:layout_weight="1"/>
+
+                        <android.support.constraint.ConstraintLayout
+                            android:id="@+id/content_second"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                            tools:context=".ui.activities.second_screen.SecondActivity"
+                            tools:showIn="@layout/activity_second">
+
+                            <ImageView
+                                android:id="@+id/imageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:layout_marginTop="16dp"
+                                android:adjustViewBounds="true"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintLeft_toLeftOf="@+id/imageView2"
+                                app:layout_constraintRight_toLeftOf="@+id/imageView2"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
+
+                            <ImageView
+                                android:id="@+id/imageView2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:layout_marginLeft="16dp"
+                                android:layout_marginRight="16dp"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginTop="16dp"
+                                android:adjustViewBounds="true"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
+
+                            <ImageView
+                                android:id="@+id/imageView3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="16dp"
+                                android:layout_marginTop="16dp"
+                                android:adjustViewBounds="true"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintLeft_toRightOf="@+id/imageView"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
+                        </android.support.constraint.ConstraintLayout>
+
+                        <ImageView
+                            app:srcCompat="@drawable/ic_developer_board_black_24dp"
+                            android:id="@+id/imageView5"
+                            android:layout_weight="1"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:text="Завантаження в прилад"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:layout_marginTop="16dp"
-                        android:adjustViewBounds="true"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="@+id/imageView2"
-                        app:layout_constraintRight_toLeftOf="@+id/imageView2"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
-
-                    <ImageView
-                        android:id="@+id/imageView2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:adjustViewBounds="true"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
-
-                    <ImageView
-                        android:id="@+id/imageView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:layout_marginTop="16dp"
-                        android:adjustViewBounds="true"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toRightOf="@+id/imageView"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/ic_play_arrow_black_24dp"/>
-                </android.support.constraint.ConstraintLayout>
-
-                <ImageView
-                    app:srcCompat="@drawable/ic_developer_board_black_24dp"
-                    android:id="@+id/imageView5"
-                    android:layout_weight="1"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"/>
+                        android:id="@+id/textView3"
+                        android:gravity="center"/>
+                </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                android:text="Завантаження в прилад"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView3"
-                android:gravity="center"/>
-        </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
 
     </RelativeLayout>
 
