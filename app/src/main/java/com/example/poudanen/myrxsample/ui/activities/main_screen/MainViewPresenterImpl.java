@@ -126,4 +126,9 @@ public class MainViewPresenterImpl<V extends MainView> extends BasePresenter<V> 
                     }
                 });
     }
+
+    @Override
+    public void openSecondActivity() {
+        getBaseView().openSecondScreen();
+    }
 }

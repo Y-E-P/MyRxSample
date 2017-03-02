@@ -19,4 +19,6 @@ public interface MainPresenter<V extends MainView> extends IBasePresenter<V> {
     void getUser();
 
     void saveData(String login, String password);
+
+    void openSecondActivity();
 }

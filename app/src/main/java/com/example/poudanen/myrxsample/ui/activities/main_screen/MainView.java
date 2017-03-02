@@ -18,4 +18,6 @@ public interface MainView extends IBaseView {
 
     void showSomeText(String someText);
 
+    void openSecondScreen();
+
 }

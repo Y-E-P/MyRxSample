@@ -37,6 +37,13 @@ public class MainActivity extends BaseActivity implements MainView {
                 mMainPresenter.saveData(contentBinding.editLogin.getText().toString(), contentBinding.editPassword.getText().toString());
             }
         });
+
+        contentBinding.button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMainPresenter.openSecondActivity();
+            }
+        });
         mMainPresenter.OnCreate();
         mMainPresenter.getUser();
     }
@@ -87,6 +94,12 @@ public class MainActivity extends BaseActivity implements MainView {
     @Override
     public void showSomeText(String someText) {
         contentBinding.textViewDagger.setText(someText);
+    }
+
+    @Override
+    public void openSecondScreen() {
+        startActivity(new Intent(MainActivity.this, SecondActivity.class));
+        //showProgress();
     }
 
 }
