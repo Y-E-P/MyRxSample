@@ -17,6 +17,7 @@
         tools:context=".ui.activities.main_screen.MainActivity"
         tools:showIn="@layout/activity_main">
 
+
         <LinearLayout
             android:id="@+id/lay"
             android:layout_width="match_parent"
@@ -67,11 +68,12 @@
                 android:text="Button" />
 
             <Button
-                android:text="Button"
+                android:id="@+id/button2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/button2"/>
+                android:text="Hi"/>
 
         </LinearLayout>
+
     </LinearLayout>
 </layout>
